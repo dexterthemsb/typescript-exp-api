@@ -1,0 +1,57 @@
+import bcrypt from "bcrypt";
+import { Request, Response } from "express";
+import * as jwt from "jsonwebtoken";
+
+import { User } from "../models/user";
+
+import { validateEmailPasswrod, isEmailPasswordEmpty } from "../validators/authValidator";
+
+// generate a jwt token
+const generateToken = (email: string, _id: string) => {
+  return jwt.sign({ email, _id }, process.env.JWT_TOKEN_PRIVATE_KEY!);
+};
+
+// register
+export const register = async (req: Request, res: Response) => {
+  try {
+    const { email, password } = req.body;
+
+    const validations = validateEmailPasswrod(email, password);
+
+    if (validations.success) {
+      const user = await User.create(req.body);
+      res.status(201).json({
+        msg: "User successfully created",
+        userID: user._id,
+        token: generateToken(email, user._id)
+      });
+    } else res.status(400).json({ msg: validations.msg });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ msg: "Something went wrong" });
+  }
+};
+
+// login
+export const login = async (req: Request, res: Response) => {
+  try {
+    const { email, password } = req.body;
+
+    // check for empty email and password
+    const checkForEmptyEmailPasswod = isEmailPasswordEmpty(email, password);
+
+    if (!checkForEmptyEmailPasswod.success)
+      res.status(400).json({ msg: checkForEmptyEmailPasswod.msg });
+
+    const user: any = await User.findOne({ email });
+
+    // compare password & check for user
+    if (user && (await bcrypt.compare(password, user.password)))
+      res.status(200).json({ msg: "Logged in", token: generateToken(email, user._id) });
+    else if (!user) res.status(404).json({ msg: "Email does not exist" });
+    else res.status(401).json({ msg: "Incorrect password" });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ msg: "Something went wrong" });
+  }
+};

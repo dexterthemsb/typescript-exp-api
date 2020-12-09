@@ -4,7 +4,7 @@ import * as jwt from "jsonwebtoken";
 
 import { User } from "../models/user";
 
-import { validateEmailPasswrod, isEmailPasswordEmpty } from "../validators/authValidator";
+import { validateEmailPassword, isEmailPasswordEmpty } from "../validators/authValidator";
 
 // generate a jwt token
 const generateToken = (email: string, _id: string) => {
@@ -16,7 +16,7 @@ export const register = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
 
-    const validations = validateEmailPasswrod(email, password);
+    const validations = validateEmailPassword(email, password);
 
     if (validations.success) {
       const user = await User.create(req.body);
@@ -38,10 +38,10 @@ export const login = async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
     // check for empty email and password
-    const checkForEmptyEmailPasswod = isEmailPasswordEmpty(email, password);
+    const checkForEmptyEmailPassword = isEmailPasswordEmpty(email, password);
 
-    if (!checkForEmptyEmailPasswod.success)
-      res.status(400).json({ msg: checkForEmptyEmailPasswod.msg });
+    if (!checkForEmptyEmailPassword.success)
+      res.status(400).json({ msg: checkForEmptyEmailPassword.msg });
 
     const user: any = await User.findOne({ email });
 

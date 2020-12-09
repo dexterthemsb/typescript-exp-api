@@ -24,10 +24,10 @@ export const isEmailPasswordEmpty = (email: string | undefined, password: string
 const validatePassword = (password: string): boolean => passwordRegex.test(password);
 
 // email & password validator
-export const validateEmailPasswrod = (email: string | undefined, password: string | undefined) => {
+export const validateEmailPassword = (email: string | undefined, password: string | undefined) => {
   // check for empty email and password
-  const checkForEmptyEmailPasswod = isEmailPasswordEmpty(email, password);
-  if (!checkForEmptyEmailPasswod.success) return checkForEmptyEmailPasswod;
+  const checkForEmptyEmailPassword = isEmailPasswordEmpty(email, password);
+  if (!checkForEmptyEmailPassword.success) return checkForEmptyEmailPassword;
 
   // invalid email & invalid password
   if (!validatePassword(password!) && !validateEmail(email!))

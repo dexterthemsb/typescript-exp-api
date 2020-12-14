@@ -1,15 +1,11 @@
 import bcrypt from "bcrypt";
 import { Request, Response } from "express";
-import * as jwt from "jsonwebtoken";
 
 import { User } from "../models/user";
 
 import { validateEmailPassword, isEmailPasswordEmpty } from "../validators/authValidator";
 
-// generate a jwt token
-const generateToken = (email: string, _id: string) => {
-  return jwt.sign({ email, _id }, process.env.JWT_TOKEN_PRIVATE_KEY!);
-};
+import { generateToken } from "../utils/authUtils";
 
 // register
 export const register = async (req: Request, res: Response) => {
@@ -20,6 +16,7 @@ export const register = async (req: Request, res: Response) => {
 
     if (validations.success) {
       const user = await User.create(req.body);
+
       res.status(201).json({
         msg: "User successfully created",
         userID: user._id,
@@ -54,4 +51,9 @@ export const login = async (req: Request, res: Response) => {
     console.log(err);
     res.status(500).json({ msg: "Something went wrong" });
   }
+};
+
+// logout
+export const logout = async (req: Request, res: Response) => {
+  console.log("Logout");
 };
